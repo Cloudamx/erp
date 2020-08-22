@@ -70,4 +70,30 @@ public class SysController {
     public String toDeptManager(){
         return "system/dept/deptManager";
     }
+
+    /**
+     * 跳转到菜单管理页面
+     * @return
+     */
+    @RequestMapping("/toMenuManager")
+    public String toMenuManager() {
+        return "system/menu/menuManager";
+    }
+    /**
+     * 跳转到菜单管理页面-left
+     * @return
+     */
+    @RequestMapping("/toMenuLeft")
+    public String toMenuLeft() {
+        return "system/menu/left";
+    }
+    /**
+     * 跳转到菜单管理页面-right
+     * @return
+     */
+    @RequestMapping("/toMenuRight")
+    public String toMenuRight() {
+        return "system/menu/right";
+    }
+
 }

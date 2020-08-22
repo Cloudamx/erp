@@ -8,6 +8,7 @@ import com.Cloudam.sys.utils.JSONResult;
 import com.Cloudam.sys.utils.SystemConstant;
 import com.Cloudam.sys.utils.TreeNode;
 import com.Cloudam.sys.vo.DeptVo;
+import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -18,9 +19,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
+import java.util.concurrent.CountDownLatch;
 
 /**
  * <p>
@@ -95,5 +95,50 @@ public class DeptController {
         }
         return SystemConstant.ADD_ERROR;
     }
+    @RequestMapping("/updateDept")
+    public JSONResult updateDept(Dept dept){
+        dept.setCreatetime(new Date());
+        if(deptService.updateById(dept)){
+            return SystemConstant.UPDATE_SUCCESS;
+        }
+        return SystemConstant.UPDATE_ERROR;
+    }
+
+    @RequestMapping("/checkDeptHasChild")
+    public String checkDeptHasChild(int id){
+        Map<String,Object> map = new HashMap<>();
+        QueryWrapper<Dept> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("pid",id);
+        //统计部门数量
+        int count = deptService.count(queryWrapper);
+
+        if(count>0){
+            map.put(SystemConstant.EXIST,true);
+            map.put(SystemConstant.MESSAGE,"对不起,当前部门下有子节点无法删除");
+        }else{
+            //木有子节点，不提示直接删除
+            map.put(SystemConstant.EXIST,false);
+
+        }
+        //转化JSON格式
+        return JSON.toJSONString(map);
+    }
+
+    /**
+     * 删除部门
+     * @param id
+     * @return
+     */
+
+
+    @RequestMapping("/deleteDept")
+    public JSONResult deleteDept(int id){
+         if(deptService.removeById(id)){
+             return SystemConstant.DELETE_SUCCESS;
+         }else{
+             return SystemConstant.DELETE_ERROR;
+         }
+    }
+
 }
 

@@ -21,6 +21,8 @@ public class TreeNode {
     //子节点菜单
     private List<TreeNode> children = new ArrayList<TreeNode>();
 
+
+
     public Integer getId() {
         return id;
     }
@@ -97,5 +99,13 @@ public class TreeNode {
         this.href = href;
         this.spread = spread;
     }
+
+    public TreeNode(Integer id, Integer pid, String title, Boolean spread) {
+        this.id = id;
+        this.pid = pid;
+        this.title = title;
+        this.spread = spread;
+    }
+
 
 }

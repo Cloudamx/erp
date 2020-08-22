@@ -53,8 +53,8 @@
     </div>
 
     <div id="deptRowBar" style="display: none;">
-        <button type="button" class="layui-btn layui-btn-sm" ><span class="layui-icon layui-icon-edit"></span>更新</button>
-        <button type="button"  class="layui-btn layui-btn-sm layui-btn-danger" ><span class="layui-icon layui-icon-delete"></span>删除</button>
+        <button type="button" class="layui-btn layui-btn-sm" lay-event="update"><span class="layui-icon layui-icon-edit"></span>更新</button>
+        <button type="button"  class="layui-btn layui-btn-sm layui-btn-danger" lay-event="delete"><span class="layui-icon layui-icon-delete"></span>删除</button>
     </div>
 </div>
 <!-- 数据表格结束 -->
@@ -79,6 +79,8 @@
         <div class="layui-form-item">
             <label class="layui-form-label">部门地址</label>
             <div class="layui-input-block">
+                <!--部门id-->
+                <input type = "hidden" name = "id">
                 <input type="text" name="address" lay-verify="required" autocomplete="off" placeholder="请输入部门地址" class="layui-input">
             </div>
         </div>
@@ -176,19 +178,19 @@
 
         //打开窗口
         function openAddDeptWindow() {
-            mainIndex = layer.open({
-                type:1,
-                title:"添加部门",
-                area:["800px","500px"],
-                content:$("#addOrUpdateDiv"),   //引用的内容窗口
-                success:function () {
-                    //清空表单数据
-                    $("#dataFrm")[0].reset();
-                    //添加提交的路径
-                    url = "/sys/dept/addDept"
-                }
+                mainIndex = layer.open({
+                    type:1,
+                    title:"添加部门",
+                    area:["800px","500px"],
+                    content:$("#addOrUpdateDiv"),   //引用的内容窗口
+                    success:function () {
+                        //清空表单数据
+                        $("#dataFrm")[0].reset();
+                        //添加提交的路径
+                        url = "/sys/dept/addDept"
+                    }
 
-            });
+                });
         }
         //初始化父级部门的下拉菜单树
         var deptTree = dtree.renderSelect({
@@ -224,12 +226,75 @@
             },"json");
             return false;          //AJAX只做一半，不让跳转
         });
+        //绑定监听行工具栏
+        table.on("tool(deptTable)",function (obj) {
+            switch (obj.event) {
+                case 'update':
+                    openUpdateDeptWindows(obj.data);
+                    break;
+                case 'delete':
+                    opendeleteDeptWindows(obj.data);
+                    break;
+            }
+        });
 
+        //打开修改窗口
+        function openUpdateDeptWindows(data) {
+            mainIndex = layer.open({
+                type:1,
+                title:"修改部门",
+                area:["800px","500px"],
+                content:$("#addOrUpdateDiv"),   //引用的内容窗口
+                success:function () {
+                    //回显表单数据
+                    form.val("dataFrm",data);
+                    //树节点回显
+                    dtree.dataInit("deptTree",data.pid);
+                    dtree.setSelectValue("deptTree");
+                    //添加提交的路径
+                    url = "/sys/dept/updateDept"
+                }
 
+            });
+        }
 
-
-
-
+        //打开删除提示窗口
+        function opendeleteDeptWindows(data) {
+            //有子不删
+            $.post("/sys/dept/checkDeptHasChild",{"id":data.id},function (result) {
+                if(result.exist){
+                    layer.msg(result.message);
+                }else{
+                     //不存在则直接删除、又要发送请求
+                    //提示是否删除
+                    layer.confirm("确定要删除这数据吗？",{icon: 3,title: '提示'},function (index) {
+                        //先获取数据
+                        var checkData = data.data;
+                        //再获取所选数据中行id
+                        var idArr = [];    //声明数组这么神奇的吗
+                        for(var i = 0; i < length; i++){
+                            idArr.push(checkData[i].id);
+                        }
+                        //id数组
+                        var ids = idArr.join(",");
+                        //发送删除的请求
+                        $.post("/sys/dept/deleteDept",{"id":data.id},function (result) {
+                            //判断是否成功
+                            if(result.success){
+                                //刷新数据表格
+                                tableIns.reload();
+                                //刷新下拉菜单树
+                                deptTree.reload();
+                                //刷新左侧下拉树
+                                window.parent.left.deptTree.reload();
+                            }
+                            lay.msg(result.message);
+                        },"json");
+                        layer.close(index);
+                    });
+                }
+            },"json");
+        }
 
     });
     //供左页面调用的方法

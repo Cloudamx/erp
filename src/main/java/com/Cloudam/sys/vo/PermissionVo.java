@@ -8,7 +8,7 @@ import com.Cloudam.sys.entity.Permission;
  * @Date:16:09星期六
  */
 
-public class permissionVo extends Permission {
+public class PermissionVo extends Permission {
     private Integer page;   //当前页码
     private Integer limit;  //每页显示数量
 

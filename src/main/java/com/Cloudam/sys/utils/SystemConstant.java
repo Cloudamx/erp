@@ -90,5 +90,12 @@ public interface SystemConstant {
      */
     JSONResult UPDATE_ERROR = new JSONResult(false,"修改失败");
 
-
+    /**
+     * 是否存在
+     */
+    String EXIST = "exist";
+    /**
+     * 验证信息
+     */
+    String MESSAGE = "message";
 }
