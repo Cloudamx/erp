@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta http-equiv="Access-Control-Allow-Origin" content="*">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <link rel="icon" href="/favicon.ico">
+    <link rel="stylesheet" href="/resources/layui/css/layui.css" media="all" />
+    <link rel="stylesheet" href="/resources/css/public.css" media="all" />
+    <link rel="stylesheet" href="/resources/layui_ext/dtree/dtree.css" media="all" />
+    <link rel="stylesheet" href="/resources/layui_ext/dtree/font/dtreefont.css" media="all" />
+</head>
+<body>
+<!-- 树节点容器开始 -->
+<ul id="deptTree" class="dtree" data-id="0"></ul>
+<!-- 树节点容器结束 -->
+
+<script src="/resources/layui/layui.js"></script>
+<script>
+    var deptTree;
+    layui.extend({
+        dtree: '/resources/layui_ext/dtree/dtree'    //路径
+    }).use(['jquery','layer','dtree'],function () {
+        var $ = layui.jquery;
+        var layer = layui.layer;
+        var dtree = layui.dtree;
+
+        //初始化渲染节点
+        deptTree = dtree.render({
+            elem:"#deptTree",
+            url:"/sys/dept/loadDeptTreeLeft",
+            dataStyle:"layuiStyle",
+            response:{message:"msg",statusCode:0},
+            dataFormat:"list"
+        });
+        //监听节点事件
+        dtree.on("node('deptTree')",function (obj) {
+           window.parent.right.loadTableData(obj.param.nodeId);
+        });
+        //监听树节点的事件
+        dtree.on("node(deptTree)",function (obj) {
+            window.parent.right.loadTableData(obj.param.nodeId);
+        })
+        //供右边调用的方法
+        function reload() {
+            deptTree.reload();
+        }
+
+
+    });
+   
+</script>
+</body>
+</html>

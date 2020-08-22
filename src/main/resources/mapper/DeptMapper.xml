@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.Cloudam.sys.dao.DeptMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.Cloudam.sys.entity.Dept">
+        <id column="id" property="id" />
+        <result column="pid" property="pid" />
+        <result column="title" property="title" />
+        <result column="open" property="open" />
+        <result column="address" property="address" />
+        <result column="createtime" property="createtime" />
+        <result column="remark" property="remark" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, pid, title, open, address, createtime, remark
+    </sql>
+
+</mapper>

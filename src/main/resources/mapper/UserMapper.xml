@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.Cloudam.sys.dao.UserMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.Cloudam.sys.entity.User">
+        <id column="id" property="id" />
+        <result column="loginname" property="loginname" />
+        <result column="loginpwd" property="loginpwd" />
+        <result column="name" property="name" />
+        <result column="address" property="address" />
+        <result column="sex" property="sex" />
+        <result column="deptid" property="deptid" />
+        <result column="hiredate" property="hiredate" />
+        <result column="mgr" property="mgr" />
+        <result column="type" property="type" />
+        <result column="imgpath" property="imgpath" />
+        <result column="available" property="available" />
+        <result column="salt" property="salt" />
+        <result column="remark" property="remark" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, loginname, loginpwd, name, address, sex, deptid, hiredate, mgr, type, imgpath, available, salt, remark
+    </sql>
+
+</mapper>
