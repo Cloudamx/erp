@@ -273,6 +273,7 @@
 
         }
 
+        //删除菜单
         function deleteMenu(data) {
             //判断该菜单下是否有子节点，如果有子节点则提示无法删除，否则直接删除当前节点
             $.post("/sys/menu/checkMenuHasChildren",{"id":data.id},function(result){

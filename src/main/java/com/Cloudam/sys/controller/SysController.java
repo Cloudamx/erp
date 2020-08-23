@@ -96,4 +96,40 @@ public class SysController {
         return "system/menu/right";
     }
 
+
+
+    /**
+     * 跳转到权限管理页面
+     * @return
+     */
+    @RequestMapping("/toPermissionManager")
+    public String toPermissionManager() {
+        return "system/permission/PermissionManager";
+    }
+    /**
+     * 跳转到权限管理页面-left
+     * @return
+     */
+    @RequestMapping("/toPermissionLeft")
+    public String toPermissionLeft() {
+        return "system/permission/left";
+    }
+    /**
+     * 跳转到权限管理页面-right
+     * @return
+     */
+    @RequestMapping("/toPermissionRight")
+    public String toPermissionRight() {
+        return "system/permission/right";
+    }
+
+    /**
+     * 跳转到角色管理页面
+     * @return
+     */
+    @RequestMapping("/toRoleManager")
+    public String toRoleManager() {
+        return "system/role/roleManager";
+    }
+
 }

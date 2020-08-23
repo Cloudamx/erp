@@ -201,7 +201,7 @@ public class MenuController {
     }
 
     /**
-     * 删除菜单
+     * 删除权限
      * @param id
      * @return
      */
