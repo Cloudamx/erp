@@ -18,10 +18,20 @@ public class TreeNode {
     private String icon;//菜单节点图标
     private String href;//菜单路径
     private Boolean spread;//是否展开
+    private String checkArr = "0";  //是否选中
+
     //子节点菜单
     private List<TreeNode> children = new ArrayList<TreeNode>();
 
 
+
+    public String getCheckArr() {
+        return checkArr;
+    }
+
+    public void setCheckArr(String checkArr) {
+        this.checkArr = checkArr;
+    }
 
     public Integer getId() {
         return id;
@@ -105,6 +115,23 @@ public class TreeNode {
         this.pid = pid;
         this.title = title;
         this.spread = spread;
+    }
+
+    /**
+     *
+     * @param id
+     * @param pid
+     * @param title
+     * @param spread
+     * @param checkArr
+     */
+
+    public TreeNode(Integer id, Integer pid, String title, Boolean spread, String checkArr) {
+        this.id = id;
+        this.pid = pid;
+        this.title = title;
+        this.spread = spread;
+        this.checkArr = checkArr;
     }
 
 

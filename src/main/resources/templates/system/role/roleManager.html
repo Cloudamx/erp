@@ -204,9 +204,12 @@
                     //删除权限
                     deleteRole(obj.data);
                     break;
+                case 'selectRolePermission':
+                    //分配权限
+                    selectRolePermission(obj.data);
+                    break;
             }
         });
-
         //修改角色
         function openUpdateRoleWindow(data) {
             mainIndex = layer.open({
@@ -221,10 +224,7 @@
                     url = "/sys/role/updateRole";
                 }
             });
-
-
         }
-
         //删除角色
         function deleteRole(data) {
             //不存在则直接删除
@@ -241,7 +241,39 @@
                 layer.close(index);
             })
         }
+        //分配权限
+        function selectRolePermission(data) {
+            mainIndex = layer.open({
+                type:1,
+                title:"分配["+data.rolename+"]权限",
+                area:["600px","500px"],
+                content:$("#selectRolePermissionDiv"),//引用的内容窗口
+                btn: ['确定','取消'],
+                yes: function(index, layero){
+                //按钮一的回调
 
+                },
+                btn2:function(index, layero){
+                //按钮二的回调
+
+                },
+                success:function () {
+                    //加载菜单树
+                    dtree.render({
+                        elem:"#permissionTree",
+                        url:"/sys/role/initPermissionByRoleId?roleId="+data.id,
+                        dataStyle: "layuiStyle",  //使用layui风格的数据格式
+                        response:{message:"msg",statusCode:0},  //修改response中返回数据的定义
+                        dataFormat:"list",
+                        checkbar: true,
+                        checkbarType: "all"
+                    });
+
+
+
+                }
+            });
+        }
 
 
 

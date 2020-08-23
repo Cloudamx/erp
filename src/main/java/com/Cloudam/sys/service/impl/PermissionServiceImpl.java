@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * <p>
@@ -27,5 +28,10 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionMapper, Permiss
         //根据菜单id或权限id删除sys_role_permission权限菜单关系表数据
         permissionMapper.deleteRolePermissionByPid(id);
         return super.removeById(id);
+    }
+
+    @Override
+    public List<Integer> findRolePermissionByRoleId(int roleId) {
+        return permissionMapper.findRolePermissionByRoleId(roleId);
     }
 }
