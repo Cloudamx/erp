@@ -1,7 +1,10 @@
 package com.Cloudam.sys.service;
 
 import com.Cloudam.sys.entity.User;
+import com.Cloudam.sys.vo.UserVo;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * <p>
@@ -13,4 +16,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface UserService extends IService<User> {
     User findUserByName(String username) throws Exception;
+
+    IPage<User> findUserListByPage(IPage<User> page,UserVo user) throws Exception;
+
 }

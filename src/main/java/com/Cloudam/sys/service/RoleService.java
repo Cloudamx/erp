@@ -12,5 +12,6 @@ import com.baomidou.mybatisplus.extension.service.IService;
  * @since 2020-08-23
  */
 public interface RoleService extends IService<Role> {
-
+    //见方法名
+    boolean saveRolePermission(int rid, String ids) throws Exception;
 }

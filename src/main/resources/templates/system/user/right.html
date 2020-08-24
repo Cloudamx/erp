@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <link rel="icon" href="/favicon.ico">
+    <link rel="stylesheet" href="/resources/layui/css/layui.css" media="all" />
+    <link rel="stylesheet" href="/resources/css/public.css" media="all" />
+    <link rel="stylesheet" href="/resources/layui_ext/dtree/dtree.css" media="all" />
+    <link rel="stylesheet" href="/resources/layui_ext/dtree/font/dtreefont.css" media="all" />
+</head>
+<body class="childrenBody">
+<!-- 查询条件开始-->
+<form class="layui-form">
+    <blockquote class="layui-elem-quote quoteBox">
+        <form class="layui-form" id="searchForm">
+            <div class="layui-form-item">
+                <div class="layui-inline">
+                    <label class="layui-form-label">用户名称</label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="loginname" id="search_loginName" class="layui-input searchVal" placeholder="请输入用户名称" />
+                    </div>
+                </div>
+                <div class="layui-inline">
+                    <label class="layui-form-label">真实名称</label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="name" id="search_name" class="layui-input searchVal" placeholder="请输入真实名称" />
+                    </div>
+                </div>
+                <div class="layui-inline">
+                    <label class="layui-form-label">开始时间</label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="startTime" id="startTime" class="layui-input searchVal" readonly placeholder="开始时间" />
+                    </div>
+                </div>
+                <div class="layui-inline">
+                    <label class="layui-form-label">结束时间</label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="endTime" id="endTime" class="layui-input searchVal" readonly placeholder="结束时间" />
+                    </div>
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <div class="layui-input-block" style="text-align: center;">
+                    <button type="button" class="layui-btn">
+                        <span class="layui-icon layui-icon-search"></span>查询
+                    </button>
+                    <button type="reset" class="layui-btn layui-btn-warm" id="resetSearch">
+                        <span class="layui-icon layui-icon-refresh-1"></span>重置
+                    </button>
+                </div>
+            </div>
+        </form>
+    </blockquote>
+</form>
+<!-- 查询条件结束-->
+
+
+<!-- 数据表格开始 -->
+<div>
+    <table class="layui-hide" id="userTable" lay-filter="userTable"></table>
+    <!-- 工具栏 -->
+    <div id="userToolBar" style="display: none;">
+        <button type="button" lay-event="add" class="layui-btn layui-btn-sm"><span class="layui-icon layui-icon-add-1"></span>添加用户</button>
+    </div>
+
+    <div id="userRowBar" style="display: none;">
+        <button type="button" lay-event="update" class="layui-btn layui-btn-sm">
+            <span class="layui-icon layui-icon-edit"></span>更新
+        </button>
+        <button type="button" lay-event="delete" class="layui-btn layui-btn-sm layui-btn-danger">
+            <span class="layui-icon layui-icon-delete"></span>删除
+        </button>
+        <button type="button" lay-event="resetPwd" class="layui-btn layui-btn-sm">
+            <span class="layui-icon layui-icon-refresh"></span>重置密码
+        </button>
+        <button type="button" lay-event="selectRole" class="layui-btn layui-btn-sm layui-btn-warm">
+            <span class="layui-icon layui-icon-edit"></span>分配角色
+        </button>
+    </div>
+</div>
+<!-- 数据表格结束 -->
+
+<!-- 添加和修改的弹出层开始 -->
+
+<div  style="display: none;padding: 5px" id="addOrUpdateDiv">
+    <form class="layui-form" style="width:90%;" id="dataFrm" lay-filter="dataFrm">
+        <!-- 隐藏域，保存用户id -->
+        <input type="hidden" name="id" id="id">
+        <div class="layui-form-item">
+            <label class="layui-form-label">所属部门</label>
+            <div class="layui-input-block">
+                <!-- 隐藏域：保存选中部门的节点id -->
+               
+                <ul id="deptTree" class="dtree" data-id="0"></ul>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">领导部门</label>
+            <div class="layui-input-block">
+                <ul id="mgrTree" class="dtree" data-id="0"></ul>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">直属领导</label>
+            <div class="layui-input-block">
+                <select name="mgr" id="mgr">
+                    <option value="0">请选择直属领导</option>
+                </select>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-inline">
+                <label class="layui-form-label">用户姓名</label>
+                <div class="layui-input-block">
+                    <input type="text" name="name" id="name" lay-verify="required" autocomplete="off" placeholder="请输入用户姓名" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">登陆名称</label>
+                <div class="layui-input-block">
+                    <input type="text" name="loginname" id="loginname" lay-verify="required"  autocomplete="off" placeholder="请输入登陆名称" class="layui-input">
+                </div>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">用户地址</label>
+            <div class="layui-input-block">
+                <input type="text" name="address" lay-verify="required" autocomplete="off" placeholder="请输入用户地址" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">用户备注</label>
+            <div class="layui-input-block">
+                <textarea class="layui-textarea" name="remark" id="content"></textarea>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-inline">
+                <label class="layui-form-label">用户性别</label>
+                <div class="layui-input-block">
+                    <input type="radio" name="sex" value="1" title="男" checked="">
+                    <input type="radio" name="sex" value="0" title="女" >
+                </div>
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">是否可用</label>
+                <div class="layui-input-block">
+                    <input type="radio" name="available" value="1" title="是" checked="">
+                    <input type="radio" name="available" value="0" title="否" >
+                </div>
+            </div>
+        </div>
+
+        <div class="layui-form-item layui-row layui-col-xs12">
+            <div class="layui-input-block" style="text-align: center;">
+                <button type="button" class="layui-btn"><span class="layui-icon layui-icon-add-1"></span>提交</button>
+                <button type="button" class="layui-btn layui-btn-warm" ><span class="layui-icon layui-icon-refresh-1"></span>重置</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<!-- 添加和修改的弹出层结束 -->
+
+<!-- 用户分配角色弹出层  开始 -->
+<div style="display: none;padding: 5px" id="selectUserRoleDiv">
+    <table class="layui-hide" id="roleTable" lay-filter="roleTable"></table>
+</div>
+<!-- 用户分配角色弹出层  结束 -->
+
+
+
+<script type="text/javascript" src="/resources/layui/layui.js"></script>
+<script type="text/javascript">
+
+    var tableIns;
+    layui.extend({
+        dtree: '/resources/layui_ext/dtree/dtree'   // {/}的意思即代表采用自有路径，即不跟随 base 路径
+    }).use(['jquery','form','table','layer','dtree','laydate'],function () {
+        var $=layui.jquery;
+        var form=layui.form;
+        var table=layui.table;
+        var layer=layui.layer;
+        var dtree = layui.dtree;
+        var laydate = layui.laydate;
+        //初始化时间选择器
+        laydate.render({
+            elem:'#startTime',//绑定渲染的元素
+            type:'datetime'//控件选择类型
+        });
+        laydate.render({
+            elem:'#endTime',//绑定渲染的元素
+            type:'datetime'//控件选择类型
+        });
+
+        //渲染数据
+        tableIns = table.render({
+            elem: '#userTable'
+            ,url:'/sys/user/userlist'
+            ,toolbar:'#userToolBar'
+            ,title:'部门数据表'
+            ,height: 'full-110'
+            ,page: true
+            ,cols: [ [
+                {type:'checkbox',align:'left'}
+                ,{field:'id',title:'ID',align: 'center',width : 60}
+                ,{field:'username',title:'用户名',align: 'center',width : 120}
+                ,{field:'name',title:'真实姓名',align: 'center',width : 120}
+                ,{field:'sex',title:'性别',align: 'center',templet:function (d) {
+                        return d.open == 1 ? "<font color='#00bfff'>男</font>" : "<font color='red'>女</font>";
+                    }}
+                ,{field:'deptName',title:'部门名称',align: 'center',width : 180}
+                ,{field:'mgrName',title:'直接领导',align: 'center',width : 180}
+                ,{field:'address',title:'地址',align: 'center',width : 180}
+                ,{field:'hiredate',title:'入职时间',align: 'center',width : 180}
+                ,{field:'right',title:'操作',align: 'center',toolbar:"#userRowBar",width : 200}
+            ] ]
+            ,done:function (res,curr,count) {
+                //非第一页，当前页无数据
+                if(curr>1 && res.data.length == 0){
+                    //当前页码-1
+                    var pageValue = curr - 1;
+                    tableIns.reload({
+                        page:{curr:pageValue}   //修改页码
+                    });
+                }
+            }
+        });
+        //监听模糊查询按钮提交事件
+        form.on("submit(doSearch)",function (data) {
+            tableIns.reload({
+                where:data.field,
+                page:{
+                    curr:1
+                }
+            });
+        });
+       
+
+
+    });
+
+</script>
+</body>
+</html>

@@ -246,12 +246,32 @@
             mainIndex = layer.open({
                 type:1,
                 title:"分配["+data.rolename+"]权限",
-                area:["600px","500px"],
+                area:["400px","500px"],
                 content:$("#selectRolePermissionDiv"),//引用的内容窗口
                 btn: ['确定','取消'],
                 yes: function(index, layero){
-                //按钮一的回调
+                    //按钮一的回调
+                    //监听父节点的选中事件
+                    var permissiondata = dtree.getCheckbarNodesParam("permissionTree");
+                    //声明数组
+                    var idArr =[];
+                    //循环遍历选中的节点id
+                    for (var i = 0; i <permissiondata.length ; i++) {
+                        //nodeId是当前选中的id
+                        idArr.push(permissiondata[i].nodeId);
 
+                    }
+                        //使用join()方法转成字符串
+                    var ids = idArr.join(",");
+                    //判断是否为选中
+                    if(ids.length!=0){
+                        //rid是当前要分配的角色ID，ids是选中的权限
+                        $.post("/sys/role/saveRolePermission",{"ids":ids,"rid":data.id},function (result) {
+                            layer.msg(result.message);
+                        },"json")
+                    }else {
+                        layer.msg("请选择要分配的权限");
+                    }
                 },
                 btn2:function(index, layero){
                 //按钮二的回调

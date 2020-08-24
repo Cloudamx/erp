@@ -132,4 +132,30 @@ public class SysController {
         return "system/role/roleManager";
     }
 
+    /**
+     * 跳转到用户管理页面
+     * @return
+     */
+    @RequestMapping("/toUserManager")
+    public String toUserManager() {
+        return "system/user/userManager";
+    }
+    /**
+     * 跳转到用户管理页面-left
+     * @return
+     */
+    @RequestMapping("/toUserLeft")
+    public String toUserLeft() {
+        return "system/user/left";
+    }
+    /**
+     * 跳转到用户管理页面-right
+     * @return
+     */
+    @RequestMapping("/toUserRight")
+    public String toUserRight() {
+        return "system/user/right";
+    }
+
+
 }

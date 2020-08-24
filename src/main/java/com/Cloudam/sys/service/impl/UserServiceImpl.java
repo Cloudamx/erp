@@ -3,7 +3,9 @@ package com.Cloudam.sys.service.impl;
 import com.Cloudam.sys.entity.User;
 import com.Cloudam.sys.dao.UserMapper;
 import com.Cloudam.sys.service.UserService;
+import com.Cloudam.sys.vo.UserVo;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,5 +36,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
         return userMapper.selectOne(wrapper);
 
+    }
+
+    @Override
+    public IPage<User> findUserListByPage(IPage<User> page, UserVo user) throws Exception {
+        return userMapper.findUserListByPage(page,user);
     }
 }

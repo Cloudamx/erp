@@ -1,5 +1,6 @@
 package com.Cloudam.sys.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -91,6 +92,19 @@ public class User implements Serializable {
      * 备注
      */
     private String remark;
+
+    /**
+     * 部门名称
+     */
+    @TableField(exist = false)
+    private String deptName;
+
+    /**
+     * 领导名称
+     */
+    @TableField(exist = false)
+    private String mgrName;
+
 
 
     public Integer getId() {
@@ -203,6 +217,21 @@ public class User implements Serializable {
 
     public void setRemark(String remark) {
         this.remark = remark;
+    }
+    public String getDeptName() {
+        return deptName;
+    }
+
+    public void setDeptName(String deptName) {
+        this.deptName = deptName;
+    }
+
+    public String getMgrName() {
+        return mgrName;
+    }
+
+    public void setMgrName(String mgrName) {
+        this.mgrName = mgrName;
     }
 
     @Override

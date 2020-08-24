@@ -25,4 +25,29 @@
         id, loginname, loginpwd, name, address, sex, deptid, hiredate, mgr, type, imgpath, available, salt, remark
     </sql>
 
+
+    <select id="findUserListByPage" resultType="com.Cloudam.sys.entity.User">
+        Select u.*,d.title deptName, m.name mgrName From sys_user u
+        LEFT JOIN sys_user m on m.id = u.mgr
+        LEFT JOIN sys_dept d on d.id = u.deptid
+        <where>
+            <if test="user.loginname!=null and user.loginname!=''">
+                and u.loginname like concat('%',#{user.loginname},'%')
+            </if>
+            <if test="user.name!=null and user.name!=''">
+                and u.name like concat('%',#{user.name},'%')
+            </if>
+            <if test="user.startTime!=null">
+                and u.hiredate &gt;#{user.startTime}
+            </if>
+            <if test="user.endTime!=null">
+                and u.hiredate &lt;#{user.endTime}
+            </if>
+            <if test="user.deptid!=null">
+                and u.deptid = #{user.deptid}
+            </if>
+        </where>
+
+    </select>
+
 </mapper>

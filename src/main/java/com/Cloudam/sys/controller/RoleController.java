@@ -132,20 +132,34 @@ public class RoleController {
                     checkArr = "1";
                     break;
                 }
-
             }
             //组装树节点对象
             Boolean spread = (p1.getOpen() == null || p1.getOpen() == 1) ? true:false;
             //将节点对象添加到节点集合
             treeNodes.add(new TreeNode(p1.getId(),p1.getPid(),p1.getTitle(),spread,checkArr));
         }
-
-
-
         return new DataGridViewResult(treeNodes);
     }
 
+    /**
+     *
+     * @param rid
+     * @param ids   权限id String?  因为权限有一大堆采用String储存
+     * @return
+     */
 
+    @RequestMapping("/saveRolePermission")
+    public JSONResult saveRolePermission(int rid,String ids){
+        try {
+            if(roleService.saveRolePermission(rid,ids)){
+                return SystemConstant.DISTRIBUTE_SUCCESS;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return SystemConstant.DISTRIBUTE_ERROR;
+
+    }
 
 
 

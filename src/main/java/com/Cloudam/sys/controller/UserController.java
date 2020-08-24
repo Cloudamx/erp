@@ -2,10 +2,16 @@ package com.Cloudam.sys.controller;
 
 
 import com.Cloudam.sys.entity.Log;
+import com.Cloudam.sys.entity.User;
 import com.Cloudam.sys.service.LogService;
+import com.Cloudam.sys.service.UserService;
+import com.Cloudam.sys.utils.DataGridViewResult;
 import com.Cloudam.sys.utils.JSONResult;
 import com.Cloudam.sys.utils.SystemConstant;
 import com.Cloudam.sys.vo.LoginUserVo;
+import com.Cloudam.sys.vo.UserVo;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.commons.lang3.SerializationUtils;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
@@ -37,6 +43,9 @@ public class UserController {
 
     @Resource
     private LogService logService;
+
+    @Resource
+    private UserService userService;
 
     @PostMapping("/login")
     public JSONResult login(String loginname, String pwd, HttpServletRequest request){
@@ -72,5 +81,16 @@ public class UserController {
         return SystemConstant.LOGIN_ERROR_PASS;
     }
 
+    @RequestMapping("/userlist")
+    public DataGridViewResult userlist(UserVo userVo){
+        try {
+            IPage<User> page = new Page<>(userVo.getPage(),userVo.getLimit());
+            IPage<User> userIPage = userService.findUserListByPage(page,userVo);
+            return new DataGridViewResult(userIPage.getTotal(),userIPage.getRecords());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 }
 

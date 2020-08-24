@@ -30,4 +30,24 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
             roleMapper.deleteRolePermissionByRoleId(id);
             return super.removeById(id);
     }
+
+    @Override
+    public boolean saveRolePermission(int rid, String ids) throws Exception {
+        try {
+            //先删除原有的权限
+            roleMapper.deleteRolePermissionByRoleId(rid);
+            //再添加新的权限
+            String []pids = ids.split(",");
+            //循环遍历有什么权限，存之
+            for(int i = 0; i<pids.length;i++){
+                //调用保存角色权限的方法
+                roleMapper.insertRolePermission(rid,pids[i]);
+            }
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
 }

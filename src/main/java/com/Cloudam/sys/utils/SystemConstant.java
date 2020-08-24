@@ -98,4 +98,14 @@ public interface SystemConstant {
      * 验证信息
      */
     String MESSAGE = "message";
+
+    /**
+     * 权限分配成功
+     */
+    JSONResult DISTRIBUTE_SUCCESS = new JSONResult(true,"权限分配成功");
+
+    /**
+     * 权限分配失败
+     */
+    JSONResult DISTRIBUTE_ERROR = new JSONResult(false,"权限分配失败");
 }
