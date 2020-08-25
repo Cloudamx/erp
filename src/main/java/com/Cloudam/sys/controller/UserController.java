@@ -5,11 +5,11 @@ import com.Cloudam.sys.entity.Log;
 import com.Cloudam.sys.entity.User;
 import com.Cloudam.sys.service.LogService;
 import com.Cloudam.sys.service.UserService;
-import com.Cloudam.sys.utils.DataGridViewResult;
-import com.Cloudam.sys.utils.JSONResult;
-import com.Cloudam.sys.utils.SystemConstant;
+import com.Cloudam.sys.utils.*;
 import com.Cloudam.sys.vo.LoginUserVo;
 import com.Cloudam.sys.vo.UserVo;
+import com.alibaba.fastjson.JSON;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.commons.lang3.SerializationUtils;
@@ -28,6 +28,9 @@ import javax.print.DocFlavor;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -92,5 +95,98 @@ public class UserController {
         }
         return null;
     }
+
+    @RequestMapping("/loadUserByDeptId")
+    public DataGridViewResult loadUserByDeptId(Integer deptId){
+        QueryWrapper<User> queryWrapper = new QueryWrapper<User>();
+        queryWrapper.eq("type",SystemConstant.NORMAL_USER);//只查普通用户
+        queryWrapper.eq(deptId!=null,"deptid",deptId);//部门编号
+        //调用查询方法
+        List<User> userList = userService.list(queryWrapper);
+        //返回数据
+        return new DataGridViewResult(userList);
+
+    }
+
+    //检查登录名是否存在
+    @RequestMapping("/checkLoginName")
+    public String checkLoginName(String loginName){
+        Map<String,Object> map = new HashMap<>();
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("loginname",loginName);
+        //获取验证的数量
+        if(userService.count(queryWrapper)>0){
+            map.put(SystemConstant.EXIST,true);
+            map.put(SystemConstant.MESSAGE,"登录名称已存在,请重新输入");
+        }else{
+            map.put(SystemConstant.EXIST,false);
+            map.put(SystemConstant.MESSAGE,"登录名称可以使用");
+        }
+        return JSON.toJSONString(map);
+    }
+
+    @RequestMapping("/addUser")
+    public JSONResult addUser(User user){
+        //入职日期
+        user.setHiredate(new Date());
+        //使用随机32位
+        String salt = UUIDUtil.randomUUID();
+        //默认密码
+        user.setLoginpwd(PasswordUtil.md5(SystemConstant.DEFAULT_PWD,salt,SystemConstant.HASHITERATIONS));
+        //盐值
+        user.setSalt(salt);
+        //用户类型
+        user.setType(SystemConstant.NORMAL_USER);
+        //默认头像
+        user.setImgpath("defaultimage.jpg");
+
+        if(userService.save(user)){
+            return SystemConstant.ADD_SUCCESS;
+        }else{
+            return SystemConstant.ADD_ERROR;
+        }
+    }
+
+    @RequestMapping("/updateUser")
+    public JSONResult updateUser(User user){
+        if(userService.updateById(user)){
+            return SystemConstant.UPDATE_SUCCESS;
+        }else{
+            return SystemConstant.UPDATE_ERROR;
+        }
+    }
+
+    @RequestMapping("/deleteById")
+    public JSONResult deleteById(int id){
+        if(userService.removeById(id)){
+            return SystemConstant.DELETE_SUCCESS;
+        }else{
+            return SystemConstant.DELETE_ERROR;
+        }
+    }
+
+    @RequestMapping("/resetPwd")
+    public JSONResult resetPwd(int id){
+        //重新生成UUID
+        String salt = UUIDUtil.randomUUID();
+        //创建用户对象
+        User user = new User();
+        user.setId(id);
+        user.setSalt(salt);
+        user.setLoginpwd(PasswordUtil.md5(SystemConstant.DEFAULT_PWD,salt,SystemConstant.HASHITERATIONS));
+        if(userService.updateById(user)){
+            return SystemConstant.RESET_SUCCESS;
+        }
+        return SystemConstant.RESET_ERROR;
+
+    }
+
+    @RequestMapping("/loadUserById")
+    public DataGridViewResult loadUserById(Integer id){
+        return    new  DataGridViewResult(userService.getById(id));
+    }
+
+
+
 }
 

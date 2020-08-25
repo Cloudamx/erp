@@ -91,6 +91,17 @@ public interface SystemConstant {
     JSONResult UPDATE_ERROR = new JSONResult(false,"修改失败");
 
     /**
+     * 重置成功
+     */
+    JSONResult RESET_SUCCESS = new JSONResult(true,"重置成功");
+
+    /**
+     * 重置失败
+     */
+    JSONResult RESET_ERROR = new JSONResult(false,"重置失败");
+
+
+    /**
      * 是否存在
      */
     String EXIST = "exist";
@@ -108,4 +119,16 @@ public interface SystemConstant {
      * 权限分配失败
      */
     JSONResult DISTRIBUTE_ERROR = new JSONResult(false,"权限分配失败");
+    /**
+     * 腹痛用户   futonghua腹痛话
+     */
+    Integer NORMAL_USER = 1;
+    /**
+     * default_password
+     */
+    String DEFAULT_PWD = "123456";
+    /**
+     * 没看懂
+     */
+    Integer HASHITERATIONS = 2;
 }

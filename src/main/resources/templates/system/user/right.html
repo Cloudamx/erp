@@ -98,7 +98,7 @@
             <label class="layui-form-label">所属部门</label>
             <div class="layui-input-block">
                 <!-- 隐藏域：保存选中部门的节点id -->
-               
+                <input type="hidden" name="deptid" id="deptid">
                 <ul id="deptTree" class="dtree" data-id="0"></ul>
             </div>
         </div>
@@ -161,7 +161,7 @@
 
         <div class="layui-form-item layui-row layui-col-xs12">
             <div class="layui-input-block" style="text-align: center;">
-                <button type="button" class="layui-btn"><span class="layui-icon layui-icon-add-1"></span>提交</button>
+                <button type="button" class="layui-btn" lay-submit lay-filter="doSubmit"><span class="layui-icon layui-icon-add-1"></span>提交</button>
                 <button type="button" class="layui-btn layui-btn-warm" ><span class="layui-icon layui-icon-refresh-1"></span>重置</button>
             </div>
         </div>
@@ -243,11 +243,223 @@
                 }
             });
         });
-       
+        //监听数据表格工具栏事件
+        table.on("toolbar(userTable)",function (obj) {
+           switch (obj.event) {
+                case 'add':
+                    //调用打开添加用户窗口的方法
+                   openAddUserLayer();
+                   break;
+           };
+        });
+        //监听行工具栏事件
+        table.on("tool(userTable)",function (obj) {
+            //获取当前行的数据
+            var data = obj.data;
+            switch (obj.event) {
+                case 'update':
+                    //调用打开添加用户窗口的方法
+                   openUpdateUserWindow(data);
+                   break;
+                case 'delete':
+                    //调用打开添加用户窗口的方法
+                   deleteInfo(data);
+                   break;
+                case 'resetPwd':
+                    //调用打开添加用户窗口的方法
+                    resetPwd(data);
+                   break;
+                case 'selectRole':
+                    //调用打开添加用户窗口的方法
+                   openUpdateUserWindow(data);
+                   break;
+           };
+        });
 
+        var mainIndex;//弹出层索引
+        var url;      //提交路径
+
+        //打开添加用户窗口的方法
+        function openAddUserLayer(){
+            mainIndex = layer.open({
+                type:1,
+                content:$("#addOrUpdateDiv"),   //引用的内容窗口
+                area:["800px","500px"],
+                title:'添加用户',
+                success:function () {
+                    $("#dataFrm")[0].reset();
+                    $("#deptid").val("");
+                    url = "/sys/user/addUser";
+                    $("#loginname").removeAttr("readonly");
+                }
+            })
+        }
+
+        //打开修改窗口
+        function openUpdateUserWindow(data) {
+            mainIndex = layer.open({
+                type:1,
+                title:"更新用户",
+                area:["800px","500px"],
+                content:$("#addOrUpdateDiv"),//引用的内容窗口
+                success:function () {
+                    //表单数据回显
+                    form.val("dataFrm",data);
+                    //树节点回显
+                    dtree.dataInit("deptTree",data.deptid);//部门编号
+                    dtree.setSelectValue("deptTree");
+                    //添加的提交请求
+                    url = "/sys/user/updateUser";
+                    //设置用户名为只读
+                    $("#loginname").attr("readonly","readonly");
+                    //解绑
+                    $("#loginname").unbind("blur");
+
+                    //回显领导所属部门
+                    var mgrId = data.mgr   //1.获取ID
+                    $.get("/sys/user/loadUserById",{"id":mgrId},function (result) {
+                        //获取部门数据
+                        var data = result.data;
+                        //选中部门
+                        dtree.dataInit("mgrTree",data.deptid);
+                        dtree.setSelectValue("mgrTree");
+
+                        //选中直属领导
+                        //根据选中部门id查询该部门下的员工列表
+                        $.get("/sys/user/loadUserByDeptId",{"deptId":data.deptid},function (result) {
+                            //获取用户列表
+                            var userList = result.data;
+                            //拼接下拉列表
+                            var html = "<option value=''>请选择直属领导</option>";
+                            //循环用户列表
+                            for(var i=0;i<userList.length;i++){
+                                html += "<option value='"+userList[i].id+"'>"+userList[i].name+"</option>"
+                            }
+                            //拼接
+                            $("#mgr").html(html);
+                            //数据回显
+                            $("#mgr").val(mgrId);
+                            //重新渲染下拉列表
+                            form.render("select");
+                        },"json");
+                    },"json");
+                }
+            });
+        }
+        
+        //打开删除窗口
+        function deleteInfo(data) {
+            layer.confirm("确定要删除【<font color='red'>"+data.name+"】</font>吗？",{"icon":3,"title":"提示"},function (index) {
+                $.post("/sys/user/deleteById",{"id":data.id},function (result) {
+                    if(result.success){
+                        tableIns.reload();
+                    }
+                    layer.msg(result.message);
+                },"json")
+                //关闭弹窗
+                layer.close(index);
+            });
+        }
+
+        //打开重置密码
+        function resetPwd(data) {
+            layer.confirm("确定要重置【"+data.name+"】的密码吗？",{"icon":3,"title":"提示"},function (index) {
+                $.post("/sys/user/resetPwd",{"id":data.id},function (result) {
+                    if(result.success){
+                        tableIns.reload();
+                    }
+                    layer.msg(result.message);
+                },"json")
+                //关闭弹窗
+                layer.close(index);
+            });
+        }
+        
+        //初始化父级部门的下拉菜单树
+        var deptTree = dtree.renderSelect({
+            elem:"#deptTree", //根据ID进行绑定
+            width:"100%",
+            dataStyle:"layuiStyle",
+            response:{message:"msg",statusCode:0},
+            dataFormat:"list",
+            url:"/sys/dept/loadDeptTreeLeft"
+        });
+
+        //监听点击的方法
+        dtree.on("node(deptTree)",function (obj) {
+            $("#deptid").val(obj.param.nodeId);
+        });
+
+        //初始化直属领导的下拉菜单树
+        var deptTree = dtree.renderSelect({
+            elem:"#mgrTree", //根据ID进行绑定
+            width:"100%",
+            dataStyle:"layuiStyle",
+            response:{message:"msg",statusCode:0},
+            dataFormat:"list",
+            url:"/sys/dept/loadDeptTreeLeft"
+        });
+
+        //监听点击的方法
+        dtree.on("node(mgrTree)",function (obj) {
+            //获取用户选中的部门ID
+            var deptId = obj.param.nodeId;
+            //AJAX发送请求
+            $.post("/sys/user/loadUserByDeptId",{"deptId":deptId},function (result) {
+                //获取用户下拉列表
+                var userList = result.data;
+                //拼接下拉列表？
+                var html = "<option value=''>请选择直属领导</option>"
+                //循环用户列表
+                for(var i = 0;i<userList.length;i++){
+                    html +="<option value='"+userList[i].id+"'>"+userList[i].name+"</option>"
+                }
+                //拼接
+                $("#mgr").html(html);
+                //重新渲染
+                form.render("select");
+            },"json")
+        });
+
+        //用户名是否存在
+        var checkFlag = false;
+
+        //绑定登录名称失去焦点事件
+        $("#loginname").bind("blur",function () {
+            var loginName = $(this).val().trim();
+            if(loginName.length == 0){
+                layer.msg("登录名称不能为空");
+                return;
+            }
+            $.post("/sys/user/checkLoginName",{"loginName":loginName},function (result) {
+                if(result.exist){
+                    checkFlag = true;
+                }else{
+                    checkFlag = false;
+                }
+                //弹框提示
+                layer.msg(result.message);
+            },"json");
+        })
+
+        //提交事件  需要判断
+        form.on("submit(doSubmit)",function (data) {
+            if(!checkFlag){
+                $.post(url,data.field,function (result) {
+                    if(result.success){
+                        tableIns.reload();  //刷新数据
+                    }
+                    //弹框提示
+                    layer.msg(result.message);
+                    //关闭弹窗
+                    layer.close(mainIndex);
+                },"json");
+            }else{
+                layer.msg("登录名称已存在,请重新输入！")
+            }
+        });
 
     });
-
 </script>
 </body>
 </html>
