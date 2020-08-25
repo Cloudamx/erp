@@ -3,6 +3,8 @@ package com.Cloudam.sys.controller;
 import com.Cloudam.sys.entity.Permission;
 import com.Cloudam.sys.entity.User;
 import com.Cloudam.sys.service.PermissionService;
+import com.Cloudam.sys.service.RoleService;
+import com.Cloudam.sys.service.UserService;
 import com.Cloudam.sys.utils.*;
 import com.Cloudam.sys.vo.PermissionVo;
 import com.alibaba.fastjson.JSON;
@@ -16,10 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @Author: Cloudam
@@ -34,6 +33,12 @@ public class MenuController {
     
     @Resource
     private PermissionService permissionService;
+    @Resource
+    private UserService userService;
+    @Resource
+    private RoleService roleService;
+
+
     /**
      * @Description: 加载首页菜单树
      * @Param:
@@ -63,8 +68,29 @@ public class MenuController {
         }else{
             //普通用户   需要按照角色和权限查询
             //暂时List一下
-            permissionList = permissionService.list(queryWrapper);
-
+            //permissionList = permissionService.list(queryWrapper);
+            try {
+                //根据当前用户id查询该用户拥有的角色列表
+                Set<Integer> currentUserRoleIds = userService.findUserRoleByUserId(LoginUser.getId());
+                //保存菜单集合  需要去重就选择set
+                Set<Integer> pids = new HashSet<>();
+                //循环遍历  当前用户拥有的角色列表
+                for (Integer roleId : currentUserRoleIds) {
+                    //4.根据角色Id查询每个角色下拥有的权限菜单
+                    Set<Integer> permissionIds = roleService.finRolePermissionByRoleId(roleId);
+                    //将查询出来的权限id放入集合中
+                    pids.addAll(permissionIds);
+                }
+                //有数据就模糊查询，没有就算
+                if(pids.size()>0){
+                    //拼接查询条件
+                    queryWrapper.in("id",pids);
+                    //fa?
+                    permissionList = permissionService.list(queryWrapper);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
         //创建集合，保存树节点
         List<TreeNode> treeNodes = new ArrayList<TreeNode>();

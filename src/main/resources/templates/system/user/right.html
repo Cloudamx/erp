@@ -212,7 +212,7 @@
             ,cols: [ [
                 {type:'checkbox',align:'left'}
                 ,{field:'id',title:'ID',align: 'center',width : 60}
-                ,{field:'username',title:'用户名',align: 'center',width : 120}
+                ,{field:'loginname',title:'用户名称',align: 'center',width : 120}
                 ,{field:'name',title:'真实姓名',align: 'center',width : 120}
                 ,{field:'sex',title:'性别',align: 'center',templet:function (d) {
                         return d.open == 1 ? "<font color='#00bfff'>男</font>" : "<font color='red'>女</font>";
@@ -221,7 +221,7 @@
                 ,{field:'mgrName',title:'直接领导',align: 'center',width : 180}
                 ,{field:'address',title:'地址',align: 'center',width : 180}
                 ,{field:'hiredate',title:'入职时间',align: 'center',width : 180}
-                ,{field:'right',title:'操作',align: 'center',toolbar:"#userRowBar",width : 200}
+                ,{field:'right',title:'操作',align: 'center',toolbar:"#userRowBar",width : 400}
             ] ]
             ,done:function (res,curr,count) {
                 //非第一页，当前页无数据
@@ -271,7 +271,7 @@
                    break;
                 case 'selectRole':
                     //调用打开添加用户窗口的方法
-                   openUpdateUserWindow(data);
+                    selectRole(data);
                    break;
            };
         });
@@ -292,7 +292,7 @@
                     url = "/sys/user/addUser";
                     $("#loginname").removeAttr("readonly");
                 }
-            })
+            });
         }
 
         //打开修改窗口
@@ -372,6 +372,66 @@
                 },"json")
                 //关闭弹窗
                 layer.close(index);
+            });
+        }
+
+        //打开分配角色窗口
+        function selectRole(data) {
+            mainIndex = layer.open({
+                type:1,
+                content:$("#selectUserRoleDiv"),   //引用的内容窗口
+                area:["800px","500px"],
+                title:"分配【"+data.name+"】的角色",
+                btn: ['确定','取消'],
+                yes: function(index, layero){
+                    //获取选中行
+                    var checkStatus = table.checkStatus('roleTable');
+                    //判断时候有选中行
+                    if(checkStatus.data.length == 0){
+                        layer.msg("请选择要分配权限的角色！")
+                    }else{
+                        //定义数组
+                        var idArr = [];
+                        //循环选中行
+                        for (var i = 0; i <checkStatus.data.length ; i++) {
+                            idArr.push(checkStatus.data[i].id)   //是角色编号
+                        }
+                        //将数组拼接成字符串
+                        var ids = idArr.join(",");
+                        //发送请求
+                        console.log(data.id);
+                        console.log(ids)
+                        $.post("/sys/user/saveUserRole",{"userId":data.id,"roleIds":ids},function (result) {
+                            layer.msg(result.message);
+                        },"json")
+                        layer.close(mainIndex);
+                    }
+                },
+                btn2:function(index, layero){
+                    //按钮二的回调
+
+                },
+                success:function () {
+                    initRoleTable(data);
+                }
+            });
+        }
+
+        //初始化角色列表
+        function initRoleTable(data) {
+            table.render({
+                elem: '#roleTable'
+                ,url:'/sys/user/initRoleByUserId'
+                ,where:{
+                    "id":data.id   //额外的参数   使用where   来自定义
+                }
+                ,cols: [ [
+                    {type:'checkbox',align:'center'}
+                    ,{field:'id',title:'ID',align: 'center'}
+                    ,{field:'rolecode',title:'角色编码',align: 'center'}
+                    ,{field:'rolename',title:'角色名称',align: 'center'}
+                    ,{field:'remark',title:'备注',align: 'center'}
+                ] ]
             });
         }
         

@@ -6,6 +6,8 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.Set;
+
 /**
  * <p>
  *  服务类
@@ -19,4 +21,7 @@ public interface UserService extends IService<User> {
 
     IPage<User> findUserListByPage(IPage<User> page,UserVo user) throws Exception;
 
+    Set<Integer> findUserRoleByUserId(Integer id) throws Exception;
+
+    boolean saveUserRole(int userId, String roleIds) throws Exception;
 }

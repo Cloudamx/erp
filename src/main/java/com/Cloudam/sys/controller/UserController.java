@@ -4,6 +4,7 @@ package com.Cloudam.sys.controller;
 import com.Cloudam.sys.entity.Log;
 import com.Cloudam.sys.entity.User;
 import com.Cloudam.sys.service.LogService;
+import com.Cloudam.sys.service.RoleService;
 import com.Cloudam.sys.service.UserService;
 import com.Cloudam.sys.utils.*;
 import com.Cloudam.sys.vo.LoginUserVo;
@@ -27,10 +28,7 @@ import javax.annotation.Resource;
 import javax.print.DocFlavor;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * <p>
@@ -49,6 +47,9 @@ public class UserController {
 
     @Resource
     private UserService userService;
+
+    @Resource
+    private RoleService roleService;
 
     @PostMapping("/login")
     public JSONResult login(String loginname, String pwd, HttpServletRequest request){
@@ -186,7 +187,51 @@ public class UserController {
         return    new  DataGridViewResult(userService.getById(id));
     }
 
+    @RequestMapping("/initRoleByUserId")
+    public DataGridViewResult initRoleByUserId(Integer id){
+        List<Map<String,Object>> mapList = null;
 
+        try {
+            //列表图--查询所有的
+            mapList = roleService.listMaps();
 
+            //根据id查询个别的
+            Set<Integer> roleIdsList = userService.findUserRoleByUserId(id);
+
+            //循环比较当前用户已经拥有的权限
+            for (Map<String, Object> objectmap : mapList) {
+                //定义一个标记，默认不选中
+                boolean flag = false;
+                //取出所有角色的Id;
+                int roleId = (int)objectmap.get("id");
+                //内层循环  目的是选中为了选中  flag<= true
+                for (Integer rid : roleIdsList) {
+                    if(rid == roleId){
+                        flag = true;
+                        break;
+                    }
+                }
+                objectmap.put("LAY_CHECKED",flag);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return    new  DataGridViewResult(Long.valueOf(mapList.size()),mapList);
+    }
+
+    @RequestMapping("/saveUserRole")
+    public JSONResult saveUserRole(int userId,String roleIds){
+        try {
+            if(userService.saveUserRole(userId,roleIds)){
+                return SystemConstant.DISTRIBUTE_SUCCESS;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return SystemConstant.DISTRIBUTE_ERROR;
+
+    }
 }
 

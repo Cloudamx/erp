@@ -3,6 +3,8 @@ package com.Cloudam.sys.service;
 import com.Cloudam.sys.entity.Role;
 import com.baomidou.mybatisplus.extension.service.IService;
 
+import java.util.Set;
+
 /**
  * <p>
  *  服务类
@@ -14,4 +16,6 @@ import com.baomidou.mybatisplus.extension.service.IService;
 public interface RoleService extends IService<Role> {
     //见方法名
     boolean saveRolePermission(int rid, String ids) throws Exception;
+
+    Set<Integer> finRolePermissionByRoleId(Integer roleId) throws Exception;
 }
