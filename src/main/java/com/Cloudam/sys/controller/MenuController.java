@@ -5,7 +5,7 @@ import com.Cloudam.sys.entity.User;
 import com.Cloudam.sys.service.PermissionService;
 import com.Cloudam.sys.service.RoleService;
 import com.Cloudam.sys.service.UserService;
-import com.Cloudam.sys.utils.*;
+import com.Cloudam.bus.common.utils.*;
 import com.Cloudam.sys.vo.PermissionVo;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;

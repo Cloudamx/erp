@@ -1,4 +1,4 @@
-package com.Cloudam.sys.utils;
+package com.Cloudam.bus.common.utils;
 
 import java.util.ArrayList;
 import java.util.List;

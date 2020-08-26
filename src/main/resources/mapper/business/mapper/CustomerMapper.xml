@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.Cloudam.bus.dao.CustomerMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.Cloudam.bus.entity.Customer">
+        <id column="id" property="id" />
+        <result column="customername" property="customername" />
+        <result column="address" property="address" />
+        <result column="telephone" property="telephone" />
+        <result column="linkman" property="linkman" />
+        <result column="phone" property="phone" />
+        <result column="bank" property="bank" />
+        <result column="account" property="account" />
+        <result column="email" property="email" />
+        <result column="fax" property="fax" />
+        <result column="zipcode" property="zipcode" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, customername, address, telephone, linkman, phone, bank, account, email, fax, zipcode
+    </sql>
+
+</mapper>

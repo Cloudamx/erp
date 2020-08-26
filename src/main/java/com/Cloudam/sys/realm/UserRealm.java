@@ -5,7 +5,7 @@ import com.Cloudam.sys.entity.User;
 import com.Cloudam.sys.service.PermissionService;
 import com.Cloudam.sys.service.RoleService;
 import com.Cloudam.sys.service.UserService;
-import com.Cloudam.sys.utils.SystemConstant;
+import com.Cloudam.bus.common.utils.SystemConstant;
 import com.Cloudam.sys.vo.LoginUserVo;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.apache.shiro.authc.AuthenticationException;

@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>请假管理</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <link rel="icon" href="/favicon.ico">
+    <link rel="stylesheet" href="/resources/layui/css/layui.css" media="all" />
+    <link rel="stylesheet" href="/resources/css/public.css" media="all" />
+</head>
+<body class="childrenBody">
+<!-- 查询条件开始-->
+
+<form class="layui-form">
+    <blockquote class="layui-elem-quote quoteBox">
+        <form class="layui-form" >
+            <div class="layui-form-item">
+                <div class="layui-inline">
+                    <label class="layui-form-label">请假标题</label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="title"  autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-inline">
+                    <label class="layui-form-label">审批状态</label>
+                    <div class="layui-input-inline">
+                        <select name="state" id="state">
+                            <option value="">请选择状态</option>
+                            <option value="0">新创建</option>
+                            <option value="1">待审批</option>
+                            <option value="2">审核通过</option>
+                            <option value="3">审核不通过</option>
+                            <option value="4">已放弃</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="layui-inline">
+                    <label class="layui-form-label">开始时间</label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="startTime" id="startTime" class="layui-input searchVal" />
+                    </div>
+                </div>
+                <div class="layui-inline">
+                    <label class="layui-form-label">结束时间</label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="endTime" id="endTime" class="layui-input searchVal" />
+                    </div>
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <div class="layui-input-block" style="text-align: center;">
+                    <button type="button" class="layui-btn" lay-submit="" lay-filter="doSearch"><span class="layui-icon layui-icon-search"></span>查询</button>
+                    <button type="reset" class="layui-btn layui-btn-warm"><span class="layui-icon layui-icon-refresh-1"></span>重置</button>
+                </div>
+            </div>
+        </form>
+    </blockquote>
+</form>
+<!-- 查询条件结束-->
+
+
+<!-- 数据表格开始 -->
+<div>
+    <table class="layui-hide" id="leavebillTable" lay-filter="leavebillTable"></table>
+    <!-- 工具栏 -->
+    <div id="leavebillToolBar" style="display: none;">
+        <button type="button" lay-event="add" class="layui-btn layui-btn-sm"><span class="layui-icon layui-icon-add-1"></span>添加请假单</button>
+        <button type="button" lay-event="update" class="layui-btn layui-btn-sm"><span class="layui-icon layui-icon-edit"></span>修改请假单</button>
+        <button type="button" lay-event="batchDelete" class="layui-btn layui-btn-sm layui-btn-danger"><span class="layui-icon layui-icon-delete"></span>批量删除</button>
+        <button type="button" lay-event="show" class="layui-btn layui-btn-sm"><span class="layui-icon layui-icon-search"></span>查看</button>
+    </div>
+</div>
+<!-- 数据表格结束 -->
+
+<!-- 添加和修改的弹出层开始 -->
+
+<div  style="display: none;padding: 5px" id="addOrUpdateDiv">
+    <form class="layui-form" style="width:90%;" id="dataFrm" lay-filter="dataFrm">
+        <!-- 隐藏域，修改时使用 -->
+        <input type="hidden" name="id">
+        <div class="layui-form-item layui-row layui-col-xs12">
+            <label class="layui-form-label">请假标题</label>
+            <div class="layui-input-block">
+                <input type="text" class="layui-input" name="title"  lay-verify="required" placeholder="请输入标题">
+            </div>
+        </div>
+        <div class="layui-form-item layui-row layui-col-xs12">
+            <div class="layui-inline">
+                <label class="layui-form-label">请假天数</label>
+                <div class="layui-input-inline">
+                    <input type="text" class="layui-input" name="days" lay-verify="required" placeholder="请输入请假天数">
+                </div>
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">请假时间</label>
+                <div class="layui-input-inline">
+                    <input type="text" class="layui-input" name="leavetime" id="leavetime" lay-verify="required" readonly placeholder="请输入请假时间">
+                </div>
+            </div>
+        </div>
+        <div class="layui-form-item layui-row layui-col-xs12">
+            <label class="layui-form-label">请假理由</label>
+            <div class="layui-input-block">
+                <textarea placeholder="请输入请假理由" name="content" id="content" class="layui-textarea userDesc"></textarea>
+            </div>
+        </div>
+        <div class="layui-form-item layui-row layui-col-xs12">
+            <div class="layui-input-block" style="text-align: center;">
+                <button type="button" class="layui-btn" lay-submit lay-filter="doSave" >
+                    <span class="layui-icon layui-icon-ok"></span>保存
+                </button>
+                <button type="button" class="layui-btn" lay-submit lay-filter="doSubmit" >
+                    <span class="layui-icon layui-icon-add-1"></span>提交
+                </button>
+                <button type="reset" class="layui-btn layui-btn-warm">
+                    <span class="layui-icon layui-icon-refresh-1"></span>重置
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<!-- 添加和修改的弹出层结束 -->
+
+<!-- 查看弹出层的开始 -->
+<div style="display: none;padding: 5px" id="showLeaveBillDiv">
+    <form class="layui-form" style="width:90%;" id="leaveBillFrm" lay-filter="leaveBillFrm">
+        <input type="hidden" name="id">
+        <div class="layui-form-item layui-row layui-col-xs12">
+            <label class="layui-form-label">请假标题</label>
+            <div class="layui-input-block">
+                <input type="text" class="layui-input" name="title"  readonly>
+            </div>
+        </div>
+        <div class="layui-form-item layui-row layui-col-xs12">
+            <div class="layui-inline">
+                <label class="layui-form-label">请假天数</label>
+                <div class="layui-input-inline">
+                    <input type="text" class="layui-input" name="days" required lay-verify="required" readonly>
+                </div>
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">请假时间</label>
+                <div class="layui-input-inline">
+                    <input type="text" class="layui-input" name="leavetime" readonly>
+                </div>
+            </div>
+        </div>
+        <div class="layui-form-item layui-row layui-col-xs12">
+            <label class="layui-form-label">请假理由</label>
+            <div class="layui-input-block">
+                <textarea placeholder="请输入请假理由" name="content" class="layui-textarea userDesc" readonly></textarea>
+            </div>
+        </div>
+    </form>
+    <div class="layui-form-item layui-row layui-col-xs12">
+        <table class="layui-table ">
+            <colgroup>
+                <col width="150">
+                <col width="300">
+                <col>
+            </colgroup>
+            <thead>
+            <tr>
+                <th>审批人</th>
+                <th>审批内容</th>
+                <th>审批时间</th>
+            </tr>
+            </thead>
+            <tbody id="checklist">
+
+            </tbody>
+        </table>
+    </div>
+</div>
+<!-- 查看弹出层的结束-->
+
+
+
+<script type="text/javascript" src="/resources/layui/layui.js"></script>
+<script type="text/javascript">
+    layui.use(['jquery','form','table','layer','laydate'],function () {
+        var $=layui.jquery;
+        var form=layui.form;
+        var table=layui.table;
+        var layer=layui.layer;
+        var laydate=layui.laydate;
+        //初始化时间选择器
+        laydate.render({
+            elem:'#startTime',//绑定渲染的元素
+            type:'datetime'//控件选择类型
+        });
+        laydate.render({
+            elem:'#endTime',//绑定渲染的元素
+            type:'datetime'//控件选择类型
+        });
+        laydate.render({
+            elem:'#leavetime',//绑定渲染的元素
+            type:'datetime'//控件选择类型
+        });
+
+        //渲染数据
+        var tableIns = table.render({
+            elem: '#leavebillTable'
+            ,url:'/bus/leavebill/leavebillList'
+            ,toolbar:'#leavebillToolBar'
+            ,title:"请假数据表"
+            ,height: 'full-170'
+            ,page: true
+            ,cols: [ [
+                {type:'checkbox',align:'left'}
+                ,{field:'id',title:'请假ID',align: 'center', width:100}
+                ,{field:'title',title:'请假标题',align: 'center', width:150}
+                ,{field:'content',title:'请假内容',align: 'center', width:200}
+                ,{field:'days',title:'请假天数',align: 'center', width:100}
+                ,{field:'leavetime',title:'请假时间',align: 'center', width:180}
+                ,{field:'createtime',title:'创建时间',align: 'center', width:180}
+                ,{field:'username',title:'请假人',align: 'center', width:100}
+                ,{field:'mgrname',title:'审批人',align: 'center', width:100}
+                ,{field:'state',title:'请假状态',align: 'center', width:100 ,templet:function (d) {
+                        if(d.state == 0){
+                            return "<font color='blue'>新创建</font>";
+                        }else if(d.state == 1){
+                            return "<font color='#ff1493'>待审批</font>";
+                        }else if(d.state == 2){
+                            return "<font color='blue'>审批通过</font>";
+                        }else if(d.state == 3){
+                            return "<font color='red'>审批不通过</font>";
+                        }
+                    }}
+            ] ]
+            ,done:function (res,curr,count) {
+                //非第一页，当前页无数据
+                if(curr>1 && res.data.length == 0){
+                    //当前页码-1
+                    var pageValue = curr - 1;
+                    tableIns.reload({
+                        page:{curr:pageValue}   //修改页码
+                    });
+                }
+            }
+        });
+        //模糊查询
+        form.on("submit(doSearch)",function (data) {
+            tableIns.reload({
+                where:data.field,
+                page:{
+                    curr:1
+                }
+            });
+        })
+
+
+        
+
+    });
+</script>
+</body>
+</html>

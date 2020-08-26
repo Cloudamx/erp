@@ -1,4 +1,4 @@
-package com.Cloudam.sys.utils;
+package com.Cloudam.bus.common.utils;
 
 /**
  * layui 数据表格类

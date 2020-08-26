@@ -1,6 +1,5 @@
-package com.Cloudam.sys.utils;
+package com.Cloudam.bus.common.utils;
 
-import com.alibaba.fastjson.annotation.JSONField;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.ArrayList;

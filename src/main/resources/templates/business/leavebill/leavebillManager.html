@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>请假管理</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <link rel="icon" href="/favicon.ico">
+    <link rel="stylesheet" href="/resources/layui/css/layui.css" media="all" />
+    <link rel="stylesheet" href="/resources/css/public.css" media="all" />
+</head>
+<body class="childrenBody">
+<!-- 查询条件开始-->
+
+<form class="layui-form">
+    <blockquote class="layui-elem-quote quoteBox">
+        <form class="layui-form" >
+            <div class="layui-form-item">
+                <div class="layui-inline">
+                    <label class="layui-form-label">请假标题</label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="title"  autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-inline">
+                    <label class="layui-form-label">审批状态</label>
+                    <div class="layui-input-inline">
+                        <select name="state" id="state">
+                            <option value="">请选择状态</option>
+                            <option value="0">新创建</option>
+                            <option value="1">待审批</option>
+                            <option value="2">审核通过</option>
+                            <option value="3">审核不通过</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="layui-inline">
+                    <label class="layui-form-label">开始时间</label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="startTime" id="startTime" class="layui-input searchVal" readonly placeholder="请输入开始时间"/>
+                    </div>
+                </div>
+                <div class="layui-inline">
+                    <label class="layui-form-label">结束时间</label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="endTime" id="endTime" class="layui-input searchVal" readonly  placeholder="请输入结束时间"/>
+                    </div>
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <div class="layui-input-block" style="text-align: center;">
+                    <button type="button" class="layui-btn" lay-submit="" lay-filter="doSearch"><span class="layui-icon layui-icon-search"></span>查询</button>
+                    <button type="reset" class="layui-btn layui-btn-warm"><span class="layui-icon layui-icon-refresh-1"></span>重置</button>
+                </div>
+            </div>
+        </form>
+    </blockquote>
+</form>
+<!-- 查询条件结束-->
+
+
+<!-- 数据表格开始 -->
+<div>
+    <table class="layui-hide" id="leavebillTable" lay-filter="leavebillTable"></table>
+    <!-- 工具栏 -->
+    <div id="leavebillToolBar" style="display: none;">
+        <button type="button" lay-event="add" class="layui-btn layui-btn-sm"><span class="layui-icon layui-icon-add-1"></span>添加请假单</button>
+        <button type="button" lay-event="update" class="layui-btn layui-btn-sm"><span class="layui-icon layui-icon-edit"></span>修改请假单</button>
+        <button type="button" lay-event="batchDelete" class="layui-btn layui-btn-sm layui-btn-danger"><span class="layui-icon layui-icon-delete"></span>批量删除</button>
+        <button type="button" lay-event="show" class="layui-btn layui-btn-sm"><span class="layui-icon layui-icon-search"></span>查看</button>
+    </div>
+</div>
+<!-- 数据表格结束 -->
+
+<!-- 添加和修改的弹出层开始 -->
+
+<div  style="display: none;padding: 5px" id="addOrUpdateDiv">
+    <form class="layui-form" style="width:90%;" id="dataFrm" lay-filter="dataFrm">
+        <!-- 隐藏域，修改时使用 -->
+        <input type="hidden" name="id">
+        <div class="layui-form-item layui-row layui-col-xs12">
+            <label class="layui-form-label">请假标题</label>
+            <div class="layui-input-block">
+                <input type="text" class="layui-input" name="title"  lay-verify="required" placeholder="请输入标题">
+            </div>
+        </div>
+        <div class="layui-form-item layui-row layui-col-xs12">
+            <div class="layui-inline">
+                <label class="layui-form-label">请假天数</label>
+                <div class="layui-input-inline">
+                    <input type="text" class="layui-input" name="days" lay-verify="required" placeholder="请输入请假天数">
+                </div>
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">请假时间</label>
+                <div class="layui-input-inline">
+                    <input type="text" class="layui-input" name="leavetime" id="leaveTime" lay-verify="required" readonly placeholder="请输入请假时间">
+                </div>
+            </div>
+        </div>
+        <div class="layui-form-item layui-row layui-col-xs12">
+            <label class="layui-form-label">请假理由</label>
+            <div class="layui-input-block">
+                <textarea placeholder="请输入请假理由" name="content" id="content" class="layui-textarea userDesc"></textarea>
+            </div>
+        </div>
+        <div class="layui-form-item layui-row layui-col-xs12">
+            <div class="layui-input-block" style="text-align: center;">
+                <button type="button" class="layui-btn" lay-submit lay-filter="doSave" >
+                    <span class="layui-icon layui-icon-ok"></span>保存
+                </button>
+                <button type="button" class="layui-btn" lay-submit lay-filter="doSubmit" >
+                    <span class="layui-icon layui-icon-add-1"></span>提交
+                </button>
+                <button type="reset" class="layui-btn layui-btn-warm">
+                    <span class="layui-icon layui-icon-refresh-1"></span>重置
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<!-- 添加和修改的弹出层结束 -->
+
+<!-- 查看弹出层的开始 -->
+<div style="display: none;padding: 5px" id="showLeaveBillDiv">
+    <form class="layui-form" style="width:90%;" id="leaveBillFrm" lay-filter="leaveBillFrm">
+        <input type="hidden" name="id">
+        <div class="layui-form-item layui-row layui-col-xs12">
+            <label class="layui-form-label">请假标题</label>
+            <div class="layui-input-block">
+                <input type="text" class="layui-input" name="title"  readonly>
+            </div>
+        </div>
+        <div class="layui-form-item layui-row layui-col-xs12">
+            <div class="layui-inline">
+                <label class="layui-form-label">请假天数</label>
+                <div class="layui-input-inline">
+                    <input type="text" class="layui-input" name="days" required lay-verify="required" readonly>
+                </div>
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">请假时间</label>
+                <div class="layui-input-inline">
+                    <input type="text" class="layui-input" name="leavetime" readonly>
+                </div>
+            </div>
+        </div>
+        <div class="layui-form-item layui-row layui-col-xs12">
+            <label class="layui-form-label">请假理由</label>
+            <div class="layui-input-block">
+                <textarea placeholder="请输入请假理由" name="content" class="layui-textarea userDesc" readonly></textarea>
+            </div>
+        </div>
+    </form>
+    <div class="layui-form-item layui-row layui-col-xs12">
+        <table class="layui-table ">
+            <colgroup>
+                <col width="150">
+                <col width="300">
+                <col>
+            </colgroup>
+            <thead>
+            <tr>
+                <th>审批人</th>
+                <th>审批内容</th>
+                <th>审批时间</th>
+            </tr>
+            </thead>
+            <tbody id="checklist">
+
+            </tbody>
+        </table>
+    </div>
+</div>
+<!-- 查看弹出层的结束-->
+
+
+<script type="text/javascript" src="/resources/layui/layui.js"></script>
+<script type="text/javascript">
+    layui.use(['jquery','form','table','layer','laydate'],function () {
+        var $=layui.jquery;
+        var form=layui.form;
+        var table=layui.table;
+        var layer=layui.layer;
+        var laydate=layui.laydate;
+        //初始化时间选择器
+        laydate.render({
+           elem:'#startTime',
+           type:'datetime'
+        });
+        laydate.render({
+           elem:'#endTime',
+           type:'datetime'
+        });
+        laydate.render({
+           elem:'#leaveTime',
+           type:'datetime'
+        });
+        //渲染数据
+        var tableIns = table.render({
+            elem: '#leavebillTable'
+            ,url:'/bus/leavebill/leavebillList'
+            ,toolbar:'#leavebillToolBar'
+            ,title:"请假数据表"
+            ,height: 'full-170'
+            ,page: true
+            ,cols: [ [
+                {type:'checkbox',align:'left'}
+                ,{field:'id',title:'请假ID',align: 'center', width:100}
+                ,{field:'title',title:'请假标题',align: 'center', width:350}
+                ,{field:'days',title:'请假天数',align: 'center', width:100}
+                ,{field:'leavetime',title:'请假时间',align: 'center', width:180}
+                ,{field:'createtime',title:'创建时间',align: 'center', width:180}
+                ,{field:'username',title:'请假人',align: 'center', width:100}
+                ,{field:'mgrname',title:'审批人',align: 'center', width:100}
+                ,{field:'state',title:'请假状态',align: 'center', width:100 ,templet:function (d) {
+                    if(d.state == 0){
+                        return "<font color='blue'>新创建</font>";
+                    }else if(d.state == 1){
+                        return "<font color='#ff1493'>待审批</font>";
+                    }else if(d.state == 2){
+                        return "<font color='blue'>审批通过</font>";
+                    }else if(d.state == 3){
+                        return "<font color='red'>审批不通过</font>";
+                    }
+                }}
+            ] ]
+            ,done:function (res,curr,count) {
+                //非第一页，当前页无数据
+                if(curr>1 && res.data.length == 0){
+                    //当前页码-1
+                    var pageValue = curr - 1;
+                    tableIns.reload({
+                        page:{curr:pageValue}   //修改页码
+                    });
+                }
+            }
+        });
+        //模糊查询
+        form.on("submit(doSearch)",function (data) {
+            tableIns.reload({
+                where:data.field,
+                page:{
+                    curr:1
+                }
+            });
+        })
+        //监听头部工具栏事件    form 和table 你有毒
+        table.on("toolbar(leavebillTable)",function (obj) {
+            switch (obj.event) {
+                case 'add':
+                    openAddBillWindow();
+                    break;
+                case 'update':
+                    updateBill();
+                    break;
+                case 'batchDelete':
+                    batchDelete();
+                    break;
+                case 'show':
+                    showBill();
+                    break;
+            }
+        });
+        //弹出层索引，提交路径
+        var mainIndex,url;
+        //打开添加请假单
+        function openAddBillWindow() {
+            mainIndex = layer.open({
+                type:1,
+                title:"添加请假条",
+                area:["800px","450px"],
+                content:$("#addOrUpdateDiv"),//引用的内容窗口
+                success:function () {
+                    //清空表单数据
+                    $("#dataFrm")[0].reset();
+                    //添加的提交请求
+                    url = "/bus/leavebill/addLeavebill";
+                }
+            });
+        }
+        //打开修改请假单
+        function updateBill(data) {
+            //获取当前选中行
+            var checkeStatus = table.checkStatus('leavebillTable');
+            //判断是否有选中行
+            var length = checkeStatus.data.length;
+            if(length!=1){
+                layer.msg("请选中一条要修改的请假的信息");
+                return;
+            }
+            if(checkeStatus.data[0].state == 0 || checkeStatus.data[0].state == 3){
+                mainIndex = layer.open({
+                    type:1,
+                    title:"修改请假条",
+                    area:["800px","400px"],
+                    content:$("#addOrUpdateDiv"),//引用的内容窗口
+                    success:function () {
+                        //数据回显
+                        form.val("dataFrm",checkeStatus.data[0]);
+                        //添加的提交请求
+                        url = "/bus/leavebill/updateLeavebill";
+                    }
+                });
+            }
+        }
+
+        //监听表单提交按钮（添加菜单和修改菜单）
+        form.on("submit(doSave)",function (data) {
+            //提交的参数
+            var param = data.field
+            param.state = 0;
+
+            $.post(url,param,function(result){
+                if(result.success){
+                    //刷新数据表格
+                    tableIns.reload();
+                }
+                //显示提示信息
+                layer.msg(result.message);
+                //关闭当前窗口
+                layer.close(mainIndex);
+            },"json");
+
+            return false;
+        });
+
+        //监听表单提交按钮（添加菜单和修改菜单）
+        form.on("submit(doSubmit)",function (data) {
+            //提交的参数
+            var param = data.field
+            param.state = 1;
+            $.post(url,param,function(result){
+                if(result.success){
+                    //刷新数据表格
+                    tableIns.reload();
+                }
+                //显示提示信息
+                layer.msg(result.message);
+                //关闭当前窗口
+                layer.close(mainIndex);
+            },"json");
+
+            return false;
+        });
+
+        //批量删除函数
+        //批量删除，如何判断
+        function batchDelete(){
+            //获取选中行
+            var checkStatus = table.checkStatus('customerTable');
+
+            //获取选中的数量
+            var length = checkStatus.data.length;
+            //判断长度是否大于0
+            if(length>0){
+                //提示是否删除
+                layer.confirm("确定要删除这些数据吗？",{icon: 3,title: '提示'},function (index) {
+                    //先获取数据
+                    var checkData = checkStatus.data;
+                    //再获取所选数据中行id
+                    var idArr = [];    //声明数组这么神奇的吗
+                    for(var i = 0; i < length; i++){
+                        idArr.push(checkData[i].id);
+                    }
+                    //id数组
+                    var ids = idArr.join(",");
+                    //发送删除的请求
+                    $.post("/bus/customer/batchDelete",{"ids":ids},function (result) {
+                        //判断时候成功
+                        if(result.success){
+                            //成功后则刷新表格
+
+                            tableIns.reload();
+                        }
+                        lay.msg(result.message);
+
+                    },"json");
+
+                    layer.close(index);
+                });
+            }else{
+                //用户小儿没有选中行，只有不会操作的用户，没有技术不关的码农,皮一下很开心
+                layer.msg('请选择要删除的行！',{icon: 0});
+            }
+        }
+
+
+        //修改角色
+        function openUpdateCustomerWindow(data) {
+            mainIndex = layer.open({
+                type:1,
+                title:"更新客户",
+                area:["800px","500px"],
+                content:$("#addOrUpdateDiv"),//引用的内容窗口
+                success:function () {
+                    //表单数据回显
+                    form.val("dataFrm",data);
+                    //添加的提交请求
+                    url = "/bus/customer/updateCustomer";
+                }
+            });
+        }
+
+        //删除删除客户
+        function deleteCustomer(data) {
+            //不存在则直接删除
+            layer.confirm("确定要删除这条数据吗?",{"icon":3,"title":"提示"},function (index) {
+                $.post("/bus/customer/deleteById",{"id":data.id},function (result) {
+                    if(result.success){
+                        //刷新数据表格
+                        tableIns.reload();
+                    }
+                    //显示提示信息
+                    layer.msg(result.message);
+                },"json");
+                //关闭弹框
+                layer.close(index);
+            })
+        }
+
+    });
+</script>
+</body>
+</html>

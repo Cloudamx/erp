@@ -3,9 +3,9 @@ package com.Cloudam.sys.controller;
 
 import com.Cloudam.sys.entity.Permission;
 import com.Cloudam.sys.service.PermissionService;
-import com.Cloudam.sys.utils.DataGridViewResult;
-import com.Cloudam.sys.utils.JSONResult;
-import com.Cloudam.sys.utils.SystemConstant;
+import com.Cloudam.bus.common.utils.DataGridViewResult;
+import com.Cloudam.bus.common.utils.JSONResult;
+import com.Cloudam.bus.common.utils.SystemConstant;
 import com.Cloudam.sys.vo.PermissionVo;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -14,7 +14,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.Cloudam.bus.dao.SysLeavebillMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.Cloudam.bus.entity.SysLeavebill">
+        <id column="id" property="id" />
+        <result column="title" property="title" />
+        <result column="content" property="content" />
+        <result column="days" property="days" />
+        <result column="leavetime" property="leavetime" />
+        <result column="createtime" property="createtime" />
+        <result column="userid" property="userid" />
+        <result column="state" property="state" />
+        <result column="checkPerson" property="checkPerson" />
+        <result column="committime" property="committime" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, title, content, days, leavetime, createtime, userid, state, checkPerson, committime
+    </sql>
+
+    <select id="findLeaveBillByPage" resultType="com.Cloudam.bus.entity.SysLeavebill">
+        select l.*,u.`name` username, m.name mgrname FROM sys_leavebill l
+        INNER join sys_user u on u.`id` = l.`userid`
+        INNER join sys_user m on m.`id` = l.`checkPerson`
+        <where>
+            <if test="leavebill.userid!=null">
+                and l.userid = #{leavebill.userid}
+            </if>
+            <if test="leavebill.checkPerson!=null">
+                and l.checkPerson = #{leavebill.checkPerson}
+            </if>
+            <if test="leavebill.title!=null and leavebill.title!=''">
+                and l.title like concat('%',#{leavebill.title},'%')
+            </if>
+            <if test="leavebill.state!=null">
+                and l.state = #{leavebill.state}
+            </if>
+            <if test="leavebill.startTime!=null">
+                and l.leavetime &gt; #{leavebill.startTime}
+            </if>
+            <if test="leavebill.endTime!=null">
+                and l.leavetime &lt; #{leavebill.endTime}
+            </if>
+        </where>
+        order by createtime desc
+    </select>
+
+</mapper>

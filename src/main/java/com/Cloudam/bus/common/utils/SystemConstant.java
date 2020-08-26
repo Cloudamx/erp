@@ -1,4 +1,4 @@
-package com.Cloudam.sys.utils;
+package com.Cloudam.bus.common.utils;
 
 /**
  * @Author: Cloudam
@@ -131,4 +131,6 @@ public interface SystemConstant {
      * 没看懂
      */
     Integer HASHITERATIONS = 2;
+    Integer LEAVE_CREATE_STATE = 0;
+    Integer LEAVE_CHECKING_STATE = 1;
 }
